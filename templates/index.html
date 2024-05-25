@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeetMe</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Meetup</h1>
+        <h2>Find a place to meet your friend</h2>
+        <form id="meetupForm">
+            <input type="text" id="location1" name="location1" placeholder="Your location" required>
+            <input type="text" id="location2" name="location2" placeholder="Friend's location" required>
+            <button type="submit">Find Meetup Point</button>
+        </form>
+        <div class="results" id="results"></div>
+    </div>
+    <script>
+        document.getElementById('meetupForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const location1 = document.getElementById('location1').value;
+            const location2 = document.getElementById('location2').value;
+            fetch('/find_meetup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `location1=${location1}&location2=${location2}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('results').innerHTML = `<p>${data.error}</p>`;
+                } else if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // Debugging: Log any errors to the console
+                document.getElementById('results').innerHTML = `<p>An error occurred: ${error}</p>`;
+            });
+        });
+    </script>
+</body>
+</html>
+</html>
